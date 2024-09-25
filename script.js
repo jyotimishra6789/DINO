@@ -3,6 +3,16 @@ console.log("Game script loaded");
 let dino = document.getElementById("dino");
 let gameContainer = document.getElementById("game");
 let isGameOver = false;
+let cactusSpeed = 300; // Default cactus speed
+
+// Check if the user is on a mobile device
+let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+// Increase speed on mobile devices
+if (isMobile) {
+    cactusSpeed = 100; // Faster speed for mobile
+    console.log("Mobile detected, increasing game speed");
+}
 
 // Function to create and return a cactus
 function createCactus() {
@@ -16,51 +26,41 @@ function createCactus() {
 
 let activeCactus = createCactus();
 
-// Event listener for jumping
 document.addEventListener("keydown", function(event) {
     if (event.key === "ArrowUp" && !isGameOver) {
         jump();
     }
 });
 
-// Add touch event listener for mobile
-gameContainer.addEventListener("touchstart", function() {
-    if (!isGameOver) {
-        jump();
-    }
-});
-
-// Function to handle jumping
 function jump() {
     if (!dino.classList.contains("jump")) {
         dino.classList.add("jump");
         setTimeout(function() {
             dino.classList.remove("jump");
-        }, 500); // Duration of the jump animation
+        }, 500);
     }
 }
 
-// Function to move the cactus
 function moveCactus() {
     let gameWidth = gameContainer.offsetWidth;
+    let cactusWidth = activeCactus.offsetWidth;
     let position = parseInt(window.getComputedStyle(activeCactus).getPropertyValue("right"));
+    
     if (position > gameWidth) {
-        activeCactus.style.right = "0px"; // Reset cactus position
+        activeCactus.style.right = "0px";
     } else {
-        activeCactus.style.right = (position + gameWidth / 200) + "px"; // Move cactus
+        // Adjust the speed based on whether it's mobile or not
+        activeCactus.style.right = (position + gameWidth / cactusSpeed) + "px";
     }
 }
 
-// Function to check for collisions
 function checkCollision() {
     let dinoRect = dino.getBoundingClientRect();
     let cactusRect = activeCactus.getBoundingClientRect();
 
-    // Calculate collision buffer
-    let horizontalBuffer = dinoRect.width * 0.3; // 30% of dino width
-    let verticalBuffer = dinoRect.height * 0.1; // 10% of dino height
+    let horizontalBuffer = dinoRect.width * 0.3;
+    let verticalBuffer = dinoRect.height * 0.1;
 
-    // Collision detection logic
     if (
         dinoRect.right - horizontalBuffer > cactusRect.left &&
         dinoRect.left + horizontalBuffer < cactusRect.right &&
@@ -72,7 +72,6 @@ function checkCollision() {
     }
 }
 
-// Main game loop
 let gameLoop = setInterval(function() {
     if (!isGameOver) {
         moveCactus();
@@ -80,17 +79,22 @@ let gameLoop = setInterval(function() {
     }
 }, 20);
 
-// Function to end the game
 function endGame() {
     isGameOver = true;
     clearInterval(gameLoop);
 }
 
-// Function to reset the game (optional)
 function resetGame() {
     isGameOver = false;
     activeCactus.style.right = "0px";
+    gameLoop = setInterval(function() {
+        if (!isGameOver) {
+            moveCactus();
+            checkCollision();
+        }
+    }, 20);
 }
+
 window.addEventListener('resize', function() {
     if (isGameOver) {
         activeCactus.style.right = "0px";
