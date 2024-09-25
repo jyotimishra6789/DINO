@@ -4,7 +4,6 @@ let dino = document.getElementById("dino");
 let gameContainer = document.getElementById("game");
 let isGameOver = false;
 
-// Create and add a cactus
 function createCactus() {
     let cactus = document.createElement("div");
     cactus.classList.add("obstacle");
@@ -27,31 +26,40 @@ function jump() {
         dino.classList.add("jump");
         setTimeout(function() {
             dino.classList.remove("jump");
-        }, 1000);
+        }, 500);
     }
 }
 
 function moveCactus() {
+    let gameWidth = gameContainer.offsetWidth;
+    let cactusWidth = activeCactus.offsetWidth;
     let position = parseInt(window.getComputedStyle(activeCactus).getPropertyValue("right"));
-    if (position > gameContainer.offsetWidth) {
-        // Reset cactus position when it goes off-screen
+    if (position > gameWidth) {
         activeCactus.style.right = "0px";
     } else {
-        activeCactus.style.right = (position + 5) + "px";
+        activeCactus.style.right = (position + gameWidth / 200) + "px";
     }
 }
 
 function checkCollision() {
-    let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
-    let cactusRight = parseInt(window.getComputedStyle(activeCactus).getPropertyValue("right"));
-    let cactusLeft = gameContainer.offsetWidth - cactusRight - activeCactus.offsetWidth;
+    let dinoRect = dino.getBoundingClientRect();
+    let cactusRect = activeCactus.getBoundingClientRect();
 
-    if (cactusLeft < 50 && cactusLeft > 0 && dinoBottom < 60) {
+    // Calculate the collision buffer (adjust these values as needed)
+    let horizontalBuffer = dinoRect.width * 0.3; // 30% of dino width
+    let verticalBuffer = dinoRect.height * 0.1; // 10% of dino height
+
+    if (
+        dinoRect.right - horizontalBuffer > cactusRect.left &&
+        dinoRect.left + horizontalBuffer < cactusRect.right &&
+        dinoRect.bottom - verticalBuffer > cactusRect.top
+    ) {
         console.log("Collision detected!");
         alert("Game Over!");
         endGame();
     }
 }
+
 
 let gameLoop = setInterval(function() {
     if (!isGameOver) {
@@ -66,7 +74,6 @@ function endGame() {
 }
 
 function resetGame() {
-    // Reset game state
     isGameOver = false;
     activeCactus.style.right = "0px";
     gameLoop = setInterval(function() {
@@ -76,3 +83,10 @@ function resetGame() {
         }
     }, 20);
 }
+
+// Handle window resizing
+window.addEventListener('resize', function() {
+    if (isGameOver) {
+        activeCactus.style.right = "0px";
+    }
+});
