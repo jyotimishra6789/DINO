@@ -91,3 +91,8 @@ function resetGame() {
     isGameOver = false;
     activeCactus.style.right = "0px";
 }
+window.addEventListener('resize', function() {
+    if (isGameOver) {
+        activeCactus.style.right = "0px";
+    }
+});
