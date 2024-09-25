@@ -1,0 +1,53 @@
+body, html {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+#game {
+    position: relative;
+    width: 100vw;
+    height: 200px;
+    background-color: #fff;
+    border: 2px solid #000;
+}
+
+#dino {
+    position: absolute;
+    bottom: 0;
+    left: 50px;
+}
+
+#dino img {
+    width: 50px;
+    height: 50px;
+}
+
+.obstacle img {
+    width: 20px;
+    height: 40px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    /* Slowing down the obstacle speed */
+    animation: move 4s infinite linear;
+}
+
+@keyframes move {
+    0% { right: 0; }
+    100% { right: 100vw; }
+}
+
+/* Slower and smoother jump animation for the dino */
+.jump {
+    animation: jump 1s ease;
+}
+
+@keyframes jump {
+    0% { bottom: 0; }
+    50% { bottom: 100px; }
+    100% { bottom: 0; }
+}
